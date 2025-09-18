@@ -10,14 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Temurin JDK 21
+        if: ${{ hashFiles('backend/ingestion/pom.xml') != '' }}
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '21'
           cache: maven
-
+          cache-dependency-path: backend/ingestion/pom.xml
       - name: Build ingestion
+        if: ${{ hashFiles('backend/ingestion/pom.xml') != '' }}
         working-directory: backend/ingestion
         run: mvn -q -B verify
+      - name: Skip (no pom yet)
+        if: ${{ hashFiles('backend/ingestion/pom.xml') == '' }}
+        run: echo "No pom.xml yet — skipping build."

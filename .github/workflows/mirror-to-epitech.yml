@@ -1,0 +1,25 @@
+name: Mirror to Epitech
+on:
+  push:
+    branches: ["**"]
+    tags: ["*"]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.MIRROR_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
+
+      - name: Push --mirror to Epitech
+        run: |
+          git remote add school git@github.com:EpitechPGE3-2025/G-PRO-500-STG-5-1-professionalwork-5.git
+          git push --mirror school

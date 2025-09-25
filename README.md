@@ -53,4 +53,3 @@ LIMIT 10;
 ```
 
 Expected: you should see cumulative cases and deaths for France by date.
-

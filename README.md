@@ -9,22 +9,6 @@ This sprint consists of:
 
 ---
 
-## 📂 Project Structure
-
-app/
-├── backend/
-│ └── ingestion/ # Java Maven project (CSV reading + DB insertion)
-│ ├── pom.xml
-│ └── src/main/java/com/covid19/ingestion/Main.java
-│
-├── db/
-│ ├── schema.sql # Table creation
-│ └── seed.sql (optional) # Test data
-│
-└── docker-compose.yml # Docker config (Postgres + Adminer)
-
----
-
 ## 🐳 Run Docker (Postgres + Adminer)
 
 ```bash

@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:16
+    container_name: covid19_db
+    environment:
+      POSTGRES_USER: covid
+      POSTGRES_PASSWORD: covid
+      POSTGRES_DB: covid
+    ports:
+    - "5433:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/00_schema.sql:ro
+
+  adminer:
+    image: adminer
+    container_name: covid19_adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  dbdata:

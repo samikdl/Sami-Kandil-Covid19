@@ -29,16 +29,19 @@ Database: covid
 
 ▶️ Run the Ingestion
 
+```bash
 mvn -q exec:java -Dexec.mainClass="com.covid19.ingestion.Main" \
   -Dexec.args="--confirmed ./time_series_covid19_confirmed_global.csv \
                --deaths ./time_series_covid19_deaths_global.csv \
                --jdbc jdbc:postgresql://localhost:5433/covid \
                --user covid --pass covid"
+```
 
 ✅ Verification
 
 Run SQL queries in Adminer (or psql) to check that data was correctly inserted:
 
+```bash
 SELECT COUNT(*) FROM daily_stats;
 
 SELECT d.date, d.cases_cum, d.deaths_cum
@@ -47,6 +50,7 @@ JOIN country c ON c.id = d.country_id
 WHERE c.name = 'France'
 ORDER BY d.date
 LIMIT 10;
+```
 
 Expected: you should see cumulative cases and deaths for France by date.
 

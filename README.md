@@ -1,7 +1,7 @@
 # 📊 Covid19 Data Ingestion
 
 ## 🚀 Objective
-This sprint consists of:
+This first sprint consists of:
 
 - Setting up the environment with Docker and PostgreSQL  
 - Ingesting COVID-19 data (confirmed cases and deaths) into the database  
@@ -53,3 +53,70 @@ LIMIT 10;
 ```
 
 Expected: you should see cumulative cases and deaths for France by date.
+
+
+## 🌐 Sprint 2 – REST API with Spring Boot
+
+This second sprint consists of:
+
+- Creating a REST API with Spring Boot
+- Connecting the API to PostgreSQL (via JDBC)
+- Exposing endpoints to fetch aggregated COVID-19 data
+
+---
+
+## ▶️ Run the API
+
+```bash
+mvn spring-boot:run
+```
+
+By default, the API runs on:
+👉 http://localhost:9090
+
+
+## 📡 Available Endpoints
+
+Global metrics (latest date by default):
+
+- GET http://localhost:9090/api/v1/metrics/global
+
+Global metrics for a specific date:
+
+- GET http://localhost:9090/api/v1/metrics/global?date=2020-04-01
+
+Country time series:
+
+- GET http://localhost:9090/api/v1/metrics/country/France
+
+Country time series with date range:
+
+- GET http://localhost:9090/api/v1/metrics/country/France?start=2020-03-01&end=2020-03-10
+
+## ✅ Example API Response
+
+```bash
+{
+  "date": "2020-04-01",
+  "cases_cumulative": 82301,
+  "deaths_cumulative": 6508
+}
+```
+
+## 🇫🇷 Country time series
+
+- GET /api/v1/metrics/country/{countryName}
+
+Example:
+
+- GET /api/v1/metrics/country/France?start=2020-03-01&end=2020-03-10
+
+Response:
+
+```bash
+[
+  { "date": "2020-03-01", "cases_cum": 130, "deaths_cum": 2 },
+  { "date": "2020-03-02", "cases_cum": 191, "deaths_cum": 3 },
+  ...
+]
+```

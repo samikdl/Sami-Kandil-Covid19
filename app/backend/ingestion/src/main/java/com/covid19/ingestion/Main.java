@@ -18,10 +18,10 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Map<String, String> arg = parseArgs(args);
         String confirmedPath = arg.get("--confirmed");
-        String deathsPath    = arg.get("--deaths");
-        String jdbc          = arg.get("--jdbc");
-        String user          = arg.get("--user");
-        String pass          = arg.get("--pass");
+        String deathsPath = arg.get("--deaths");
+        String jdbc = arg.get("--jdbc");
+        String user = arg.get("--user");
+        String pass = arg.get("--pass");
 
         if (confirmedPath == null || deathsPath == null || jdbc == null || user == null || pass == null) {
             System.err.println("Args manquants. Exemple:");

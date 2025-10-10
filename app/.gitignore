@@ -17,3 +17,5 @@ Thumbs.db
 
 # CSV data (downloaded manually)
 *.csv
+
+*.txt

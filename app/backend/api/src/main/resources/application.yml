@@ -1,0 +1,8 @@
+server:
+  port: 9090
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/covid
+    username: covid
+    password: covid

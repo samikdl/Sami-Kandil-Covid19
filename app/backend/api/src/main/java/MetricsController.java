@@ -28,4 +28,9 @@ public class MetricsController {
     if (!series.isEmpty()) out.put("latest", series.get(series.size()-1));
     return out;
   }
+
+  @GetMapping("/countries")
+  public List<String> countries() {
+      return service.getAllCountries();
+  }
 }

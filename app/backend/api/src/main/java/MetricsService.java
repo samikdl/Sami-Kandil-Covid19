@@ -69,4 +69,11 @@ public class MetricsService {
       return m;
     }, countryName, start, end);
   }
+
+  public List<String> getAllCountries() {
+    return jdbc.query(
+        "SELECT DISTINCT name FROM country ORDER BY name",
+        (rs, i) -> rs.getString("name")
+    );
+  }
 }

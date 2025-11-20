@@ -76,4 +76,52 @@ public class MetricsService {
         (rs, i) -> rs.getString("name")
     );
   }
+
+  // Nouvelle méthode : obtenir les dernières stats de tous les pays
+  public List<Map<String, Object>> getAllCountriesLatestStats() {
+    String latestDate = latestDate();
+    
+    String sql = """
+        SELECT c.name AS country, 
+               ds.cases_cum AS cases, 
+               ds.deaths_cum AS deaths
+        FROM daily_stats ds 
+        JOIN country c ON c.id = ds.country_id
+        WHERE ds.date = to_date(?, 'YYYY-MM-DD')
+        ORDER BY ds.cases_cum DESC
+        """;
+    
+    return jdbc.query(sql, (rs, i) -> {
+      Map<String, Object> m = new LinkedHashMap<>();
+      m.put("country", rs.getString("country"));
+      m.put("cases", rs.getLong("cases"));
+      m.put("deaths", rs.getLong("deaths"));
+      return m;
+    }, latestDate);
+  }
+
+  // Nouvelle méthode : obtenir le top N des pays
+  public List<Map<String, Object>> getTopCountries(String metric, int limit) {
+    String latestDate = latestDate();
+    String orderBy = metric.equalsIgnoreCase("deaths") ? "deaths_cum" : "cases_cum";
+    
+    String sql = String.format("""
+        SELECT c.name AS country, 
+               ds.cases_cum AS cases, 
+               ds.deaths_cum AS deaths
+        FROM daily_stats ds 
+        JOIN country c ON c.id = ds.country_id
+        WHERE ds.date = to_date(?, 'YYYY-MM-DD')
+        ORDER BY ds.%s DESC
+        LIMIT ?
+        """, orderBy);
+    
+    return jdbc.query(sql, (rs, i) -> {
+      Map<String, Object> m = new LinkedHashMap<>();
+      m.put("country", rs.getString("country"));
+      m.put("cases", rs.getLong("cases"));
+      m.put("deaths", rs.getLong("deaths"));
+      return m;
+    }, latestDate, limit);
+  }
 }

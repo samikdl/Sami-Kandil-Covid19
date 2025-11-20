@@ -1,14 +1,32 @@
 import { useEffect, useState } from 'react';
 import { getAllCountries } from '../services/api';
+import DateRangePicker from './DateRangePicker';
 
-type Props = {
+interface StatsPanelProps {
   date: string;
   selectedCountry: string;
   onCountryChange: (country: string) => void;
   deathRate: string;
-};
+  startDate: string;
+  endDate: string;
+  onStartDateChange: (date: string) => void;
+  onEndDateChange: (date: string) => void;
+  minDate?: string;
+  maxDate?: string;
+}
 
-export default function StatsPanel({ date, selectedCountry, onCountryChange, deathRate }: Props) {
+export default function StatsPanel({ 
+  date, 
+  selectedCountry, 
+  onCountryChange, 
+  deathRate,
+  startDate,
+  endDate,
+  onStartDateChange,
+  onEndDateChange,
+  minDate,
+  maxDate
+}: StatsPanelProps) {
   const [countries, setCountries] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +48,7 @@ export default function StatsPanel({ date, selectedCountry, onCountryChange, dea
         <div className="text-xs text-gray-400">Date des données</div>
         <div className="mt-1 text-lg font-semibold">{date || 'N/A'}</div>
       </div>
-      
+
       <div className="rounded-lg bg-white/5 p-4">
         <div className="text-xs text-gray-400">Pays sélectionné</div>
         <div className="mt-1">
@@ -50,6 +68,16 @@ export default function StatsPanel({ date, selectedCountry, onCountryChange, dea
           </select>
         </div>
       </div>
+
+      {/* Nouveau composant de sélection de période */}
+      <DateRangePicker
+        startDate={startDate}
+        endDate={endDate}
+        onStartDateChange={onStartDateChange}
+        onEndDateChange={onEndDateChange}
+        minDate={minDate}
+        maxDate={maxDate}
+      />
 
       <div className="rounded-lg bg-gradient-to-br from-rose-500/10 to-orange-500/10 border border-rose-500/20 p-4">
         <div className="text-xs text-rose-300">Taux de létalité global</div>

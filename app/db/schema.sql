@@ -18,3 +18,4 @@ CREATE INDEX IF NOT EXISTS idx_daily_stats_country_date
   ON daily_stats(country_id, date);
 CREATE INDEX IF NOT EXISTS idx_daily_stats_date
   ON daily_stats(date);
+

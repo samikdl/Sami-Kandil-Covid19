@@ -33,4 +33,18 @@ public class MetricsController {
   public List<String> countries() {
       return service.getAllCountries();
   }
+
+  // Nouveau endpoint : dernières stats de tous les pays (pour la carte)
+  @GetMapping("/countries/latest")
+  public List<Map<String, Object>> countriesLatest() {
+      return service.getAllCountriesLatestStats();
+  }
+
+  // Nouveau endpoint : top N pays par cas ou décès
+  @GetMapping("/countries/top")
+  public List<Map<String, Object>> countriesTop(
+      @RequestParam(name = "metric", defaultValue = "cases") String metric,
+      @RequestParam(name = "limit", defaultValue = "10") int limit) {
+      return service.getTopCountries(metric, limit);
+  }
 }

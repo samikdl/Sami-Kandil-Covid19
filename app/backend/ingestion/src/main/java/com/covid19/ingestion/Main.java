@@ -8,12 +8,19 @@ import java.nio.file.Path;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 public class Main {
 
     record Key(String country, LocalDate date) {}
-    static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("M/d/yy");
+    
+    // Parser corrigé : force les années 20-23 à être dans les années 2000
+    static final DateTimeFormatter DF = new DateTimeFormatterBuilder()
+        .appendPattern("M/d/")
+        .appendValueReduced(ChronoField.YEAR, 2, 2, 2000) // Force base 2000
+        .toFormatter();
 
     public static void main(String[] args) throws Exception {
         Map<String, String> arg = parseArgs(args);

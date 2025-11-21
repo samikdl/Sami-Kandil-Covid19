@@ -27,6 +27,7 @@ export default function App() {
   const [selectedCountry, setSelectedCountry] = useState('France');
   const [activeTab, setActiveTab] = useState<Tab>('map');
   
+  // Date range states
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [minDate, setMinDate] = useState('');
@@ -118,19 +119,29 @@ export default function App() {
 
   const handleDatePreset = (days: number) => {
     if (days === 0) {
-      setStartDate('');
-      setEndDate('');
-    } else if (maxDate) {
-      const end = new Date(maxDate);
+      // Tout : du début (2020-01-22) à la fin
+      setStartDate('2020-01-22');
+      setEndDate(maxDate || new Date().toISOString().split('T')[0]);
+    } else {
+      // Calculer à partir de la dernière date disponible
+      const endDateToUse = maxDate || new Date().toISOString().split('T')[0];
+      const end = new Date(endDateToUse);
       const start = new Date(end);
       start.setDate(start.getDate() - days);
-      const actualStart = minDate && new Date(minDate) > start ? minDate : start.toISOString().split('T')[0];
-      setStartDate(actualStart);
-      setEndDate(maxDate);
+      
+      // S'assurer que la date de début n'est pas avant 2020-01-22
+      const minPossible = new Date('2020-01-22');
+      const actualStart = start < minPossible ? minPossible : start;
+      
+      setStartDate(actualStart.toISOString().split('T')[0]);
+      setEndDate(endDateToUse);
     }
   };
 
+  // Calculer les statistiques du pays sélectionné
   const selectedCountryStats = countryData?.latest || countryData?.series?.[countryData.series.length - 1];
+
+  // Calculer les changements (dernier jour vs avant-dernier jour)
   const recentSeries = countryData?.series?.slice(-7) || [];
   const todayCases = selectedCountryStats?.cases_cum || 0;
   const yesterdayCases = recentSeries.length > 1 ? recentSeries[recentSeries.length - 2].cases_cum : todayCases;
@@ -141,11 +152,14 @@ export default function App() {
   const newDeaths = todayDeaths - yesterdayDeaths;
 
   const deathRate = todayCases > 0 ? ((todayDeaths / todayCases) * 100).toFixed(2) : '0';
+
+  // Mini graphique sparkline pour les 7 derniers jours
   const sparklineData = recentSeries.map((item, i) => {
     if (i === 0) return 0;
     return item.cases_cum - recentSeries[i - 1].cases_cum;
   });
 
+  // Filtrer les données selon la période
   const filteredSeries = countryData?.series?.filter(item => {
     if (!startDate && !endDate) return true;
     const itemDate = new Date(item.date);

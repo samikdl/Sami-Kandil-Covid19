@@ -7,16 +7,14 @@ type CountryStats = {
   country: string;
   cases: number;
   deaths: number;
-  lat: number;
-  lng: number;
 };
+
 
 type Props = {
   data: CountryStats[];
   onCountryClick?: (country: string) => void;
 };
 
-// Coordonnées approximatives des pays principaux
 const COUNTRY_COORDS: Record<string, [number, number]> = {
   'Afghanistan': [33.93, 67.71],
   'Albania': [41.15, 20.17],
@@ -211,7 +209,6 @@ export default function WorldMap({ data, onCountryClick }: Props) {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialiser la carte
     const map = L.map(mapRef.current, {
       center: [20, 0],
       zoom: 2,
@@ -219,8 +216,6 @@ export default function WorldMap({ data, onCountryClick }: Props) {
       maxZoom: 8,
       worldCopyJump: true,
     });
-
-    // Ajouter le fond de carte sombre
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
@@ -239,18 +234,14 @@ export default function WorldMap({ data, onCountryClick }: Props) {
     if (!mapInstanceRef.current || !data.length) return;
 
     const map = mapInstanceRef.current;
-
-    // Supprimer les anciens marqueurs
     map.eachLayer((layer) => {
       if (layer instanceof L.CircleMarker) {
         map.removeLayer(layer);
       }
     });
 
-    // Calculer le max pour la normalisation
     const maxValue = Math.max(...data.map(d => selectedMetric === 'cases' ? d.cases : d.deaths));
 
-    // Ajouter les cercles pour chaque pays
     data.forEach((country) => {
       const coords = COUNTRY_COORDS[country.country];
       if (!coords) return;

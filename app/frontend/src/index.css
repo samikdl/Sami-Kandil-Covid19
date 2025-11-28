@@ -15,6 +15,8 @@ body {
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Désactiver le zoom sur double-tap sur mobile */
+  touch-action: manipulation;
 }
 
 #root {
@@ -23,23 +25,25 @@ body {
   overflow: hidden;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+/* Scrollbar styling - Visible desktop, cachée mobile */
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-::-webkit-scrollbar-track {
-  background: #1f2937;
-}
+  ::-webkit-scrollbar-track {
+    background: #1f2937;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 3px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 3px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+  }
 }
 
 /* Selection */
@@ -68,7 +72,7 @@ body {
 .leaflet-popup-content {
   margin: 10px !important;
   color: #e5e7eb !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
 }
 
 .leaflet-control-zoom {
@@ -80,10 +84,25 @@ body {
   background: rgba(17, 24, 39, 0.8) !important;
   color: #9ca3af !important;
   border: 1px solid #1f2937 !important;
-  width: 26px !important;
-  height: 26px !important;
-  line-height: 26px !important;
-  font-size: 16px !important;
+}
+
+/* Boutons zoom plus gros sur mobile */
+@media (max-width: 768px) {
+  .leaflet-control-zoom a {
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 20px !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .leaflet-control-zoom a {
+    width: 26px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    font-size: 16px !important;
+  }
 }
 
 .leaflet-control-zoom a:hover {
@@ -91,18 +110,6 @@ body {
   color: #e5e7eb !important;
 }
 
-.leaflet-control-attribution {
-  background: rgba(17, 24, 39, 0.6) !important;
-  color: rgba(156, 163, 175, 0.6) !important;
-  font-size: 9px !important;
-  padding: 2px 4px !important;
-}
-
-.leaflet-control-attribution a {
-  color: rgba(239, 68, 68, 0.6) !important;
-}
-
-/* Hide attribution in control room style */
 .leaflet-control-attribution {
   display: none;
 }
@@ -118,7 +125,7 @@ body {
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-/* No transition for transforms (performance) */
+/* Ne pas casser les animations transform (Recharts, Leaflet, etc.) */
 *[style*="transform"] {
   transition: none !important;
 }
@@ -165,16 +172,76 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-/* Pulse animation for live indicator */
-@keyframes pulse-slow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
+/* Touch feedback pour mobile */
+@media (max-width: 768px) {
+  button:active {
+    transform: scale(0.98);
   }
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Recharts responsive */
+.recharts-wrapper {
+  font-size: 11px !important;
+}
+
+@media (max-width: 640px) {
+  .recharts-wrapper {
+    font-size: 9px !important;
+  }
+}
+
+.recharts-default-tooltip {
+  background: #1f2937 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 640px) {
+  .recharts-default-tooltip {
+    font-size: 10px !important;
+  }
+}
+
+/* Amélioration lisibilité petit écran */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.125rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Éviter le débordement horizontal global */
+body {
+  overflow-x: hidden;
+}
+
+/* Empêcher les images de déborder, mais laisser les SVG intacts (Recharts, Leaflet, etc.) */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Safe area pour encoche iPhone */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Désactiver le pull-to-refresh sur mobile */
+body {
+  overscroll-behavior-y: contain;
 }

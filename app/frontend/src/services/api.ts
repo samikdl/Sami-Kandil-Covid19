@@ -1,6 +1,9 @@
 import type { GlobalMetrics, CountryData } from '../types';
 
-const BASE_URL = import.meta.env.VITE_API_BASE || 'http://localhost:9090/api/v1';
+const DEFAULT_API_BASE = `${window.location.protocol}//${window.location.hostname}:9090/api/v1`;
+const BASE_URL = import.meta.env.VITE_API_BASE || DEFAULT_API_BASE;
+
+console.log('[API] BASE_URL =', BASE_URL); // pour vérifier
 
 export async function getGlobalMetrics(): Promise<GlobalMetrics> {
   const res = await fetch(`${BASE_URL}/metrics/global`);
@@ -18,7 +21,9 @@ export async function getCountryData(
   if (endDate) params.append('end', endDate);
   
   const queryString = params.toString();
-  const url = `${BASE_URL}/metrics/country/${country}${queryString ? `?${queryString}` : ''}`;
+  const url = `${BASE_URL}/metrics/country/${encodeURIComponent(country)}${
+    queryString ? `?${queryString}` : ''
+  }`;
   
   const res = await fetch(url);
   if (!res.ok) throw new Error(`API /country failed: ${res.status}`);
@@ -31,7 +36,6 @@ export async function getAllCountries(): Promise<string[]> {
   return res.json();
 }
 
-// Nouvelle fonction pour obtenir les dernières stats de tous les pays (pour la carte)
 export type CountryLatestStats = {
   country: string;
   cases: number;
@@ -44,12 +48,16 @@ export async function getAllCountriesLatestStats(): Promise<CountryLatestStats[]
   return res.json();
 }
 
-// Fonction pour obtenir les top N pays par cas ou décès
 export async function getTopCountries(
   metric: 'cases' | 'deaths' = 'cases',
   limit: number = 10
 ): Promise<CountryLatestStats[]> {
-  const res = await fetch(`${BASE_URL}/metrics/countries/top?metric=${metric}&limit=${limit}`);
+  const params = new URLSearchParams({
+    metric,
+    limit: String(limit),
+  });
+
+  const res = await fetch(`${BASE_URL}/metrics/countries/top?${params.toString()}`);
   if (!res.ok) throw new Error(`API /countries/top failed: ${res.status}`);
   return res.json();
 }

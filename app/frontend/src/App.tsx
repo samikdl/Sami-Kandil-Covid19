@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, BarChart2, Globe, GitCompare } from 'lucide-react';
+import { TrendingUp, BarChart2, Globe, GitCompare, ChevronDown } from 'lucide-react';
 
 import Shell from './layouts/Shell';
 import WorldMap from './components/WorldMap';
@@ -27,11 +27,13 @@ export default function App() {
   const [selectedCountry, setSelectedCountry] = useState('France');
   const [activeTab, setActiveTab] = useState<Tab>('map');
   
-  // Date range states
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
+
+  // État pour mobile
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     fetchGlobalData();
@@ -119,17 +121,14 @@ export default function App() {
 
   const handleDatePreset = (days: number) => {
     if (days === 0) {
-      // Tout : du début (2020-01-22) à la fin
       setStartDate('2020-01-22');
       setEndDate(maxDate || new Date().toISOString().split('T')[0]);
     } else {
-      // Calculer à partir de la dernière date disponible
       const endDateToUse = maxDate || new Date().toISOString().split('T')[0];
       const end = new Date(endDateToUse);
       const start = new Date(end);
       start.setDate(start.getDate() - days);
       
-      // S'assurer que la date de début n'est pas avant 2020-01-22
       const minPossible = new Date('2020-01-22');
       const actualStart = start < minPossible ? minPossible : start;
       
@@ -138,10 +137,7 @@ export default function App() {
     }
   };
 
-  // Calculer les statistiques du pays sélectionné
   const selectedCountryStats = countryData?.latest || countryData?.series?.[countryData.series.length - 1];
-
-  // Calculer les changements (dernier jour vs avant-dernier jour)
   const recentSeries = countryData?.series?.slice(-7) || [];
   const todayCases = selectedCountryStats?.cases_cum || 0;
   const yesterdayCases = recentSeries.length > 1 ? recentSeries[recentSeries.length - 2].cases_cum : todayCases;
@@ -153,13 +149,11 @@ export default function App() {
 
   const deathRate = todayCases > 0 ? ((todayDeaths / todayCases) * 100).toFixed(2) : '0';
 
-  // Mini graphique sparkline pour les 7 derniers jours
   const sparklineData = recentSeries.map((item, i) => {
     if (i === 0) return 0;
     return item.cases_cum - recentSeries[i - 1].cases_cum;
   });
 
-  // Filtrer les données selon la période
   const filteredSeries = countryData?.series?.filter(item => {
     if (!startDate && !endDate) return true;
     const itemDate = new Date(item.date);
@@ -180,41 +174,38 @@ export default function App() {
   return (
     <Shell>
       <div className="h-full flex flex-col">
-        {/* Tab Navigation */}
-        <div className="bg-gray-900 border-b border-gray-800 px-4 py-2">
-          <div className="flex gap-2">
+        {/* Tab Navigation - Responsive */}
+        <div className="bg-gray-900 border-b border-gray-800 px-2 sm:px-4 py-2">
+          <div className="flex gap-1 sm:gap-2">
             <button
               onClick={() => setActiveTab('map')}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors ${
-                activeTab === 'map'
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded transition-colors ${
+                activeTab === 'map' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'
               }`}
             >
-              <Globe className="h-4 w-4" />
-              Carte mondiale
+              <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Carte mondiale</span>
+              <span className="sm:hidden">Carte</span>
             </button>
             <button
               onClick={() => setActiveTab('charts')}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors ${
-                activeTab === 'charts'
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded transition-colors ${
+                activeTab === 'charts' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'
               }`}
             >
-              <BarChart2 className="h-4 w-4" />
-              Graphiques détaillés
+              <BarChart2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Graphiques détaillés</span>
+              <span className="sm:hidden">Graphiques</span>
             </button>
             <button
               onClick={() => setActiveTab('compare')}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors ${
-                activeTab === 'compare'
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded transition-colors ${
+                activeTab === 'compare' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'
               }`}
             >
-              <GitCompare className="h-4 w-4" />
-              Comparaison pays
+              <GitCompare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Comparaison pays</span>
+              <span className="sm:hidden">Comparer</span>
             </button>
           </div>
         </div>
@@ -222,11 +213,35 @@ export default function App() {
         {/* Content */}
         <div className="flex-1 overflow-hidden">
           {activeTab === 'map' && (
-            <div className="h-full grid grid-cols-12 gap-0">
-              {/* LEFT PANEL - Stats */}
-              <div className="col-span-2 bg-gray-900 border-r border-gray-800 overflow-y-auto">
+            <div className="h-full flex flex-col lg:grid lg:grid-cols-12 lg:gap-0">
+              {/* Stats mobiles au-dessus de la carte */}
+              <div className="lg:hidden p-3 bg-gray-900 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-gray-950 border border-gray-800 p-2 rounded">
+                    <div className="text-[9px] text-gray-500 uppercase">Confirmed</div>
+                    <div className="text-base font-bold text-red-500 tabular-nums">
+                      {globalData ? compact.format(globalData.cases_cumulative) : '---'}
+                    </div>
+                  </div>
+                  <div className="bg-gray-950 border border-gray-800 p-2 rounded">
+                    <div className="text-[9px] text-gray-500 uppercase">Deaths</div>
+                    <div className="text-base font-bold text-gray-400 tabular-nums">
+                      {globalData ? compact.format(globalData.deaths_cumulative) : '---'}
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-950 border border-gray-800 p-2 rounded">
+                  <div className="text-[9px] text-gray-500 uppercase mb-1">{selectedCountry}</div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">Cases:</span>
+                    <span className="text-red-400 font-mono">{compact.format(todayCases)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* LEFT PANEL - Desktop only */}
+              <div className="hidden lg:block lg:col-span-2 bg-gray-900 border-r border-gray-800 overflow-y-auto">
                 <div className="p-3 space-y-3">
-                  {/* Total Confirmed */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-1">Total Confirmed</div>
                     <div className="text-2xl font-bold text-red-500 tabular-nums">
@@ -237,7 +252,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Total Deaths */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-1">Total Deaths</div>
                     <div className="text-2xl font-bold text-gray-400 tabular-nums">
@@ -248,7 +262,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Selected Country */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-2">Selected Region</div>
                     <div className="text-sm font-bold text-white mb-2">{selectedCountry}</div>
@@ -268,7 +281,6 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* New cases indicator */}
                     {newCases > 0 && (
                       <div className="mt-2 pt-2 border-t border-gray-800 flex items-center gap-1 text-[10px]">
                         <TrendingUp className="h-3 w-3 text-red-400" />
@@ -278,7 +290,6 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Top Countries List */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-2">Top Affected Countries</div>
                     <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
@@ -309,13 +320,13 @@ export default function App() {
               </div>
 
               {/* CENTER - Map */}
-              <div className="col-span-8 bg-gray-950 relative">
+              <div className="lg:col-span-8 bg-gray-950 relative h-[50vh] lg:h-auto">
                 <div className="absolute inset-0">
                   <WorldMap data={mapData} onCountryClick={handleCountrySelect} />
                 </div>
 
-                {/* Overlay info */}
-                <div className="absolute top-4 left-4 right-4 pointer-events-none">
+                {/* Overlay info - Desktop only */}
+                <div className="hidden lg:block absolute top-4 left-4 right-4 pointer-events-none">
                   <div className="flex items-start justify-between">
                     <div className="bg-black/60 backdrop-blur-sm border border-gray-800 rounded px-3 py-2">
                       <div className="text-[10px] text-gray-500 uppercase">Data Source</div>
@@ -328,27 +339,11 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-
-                {/* Bottom legend */}
-                <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm border border-gray-800 rounded px-3 py-2">
-                  <div className="flex items-center gap-3 text-[10px]">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                      <span className="text-gray-400">Cases</span>
-                    </div>
-                    <div className="text-gray-600">|</div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      <span className="text-gray-500">Higher concentration</span>
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              {/* RIGHT PANEL - Timeline & Details */}
-              <div className="col-span-2 bg-gray-900 border-l border-gray-800 overflow-y-auto">
+              {/* RIGHT PANEL - Desktop only */}
+              <div className="hidden lg:block lg:col-span-2 bg-gray-900 border-l border-gray-800 overflow-y-auto">
                 <div className="p-3 space-y-3">
-                  {/* Active Cases Indicator */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-1">Active Cases</div>
                     <div className="text-xl font-bold text-yellow-500 tabular-nums">
@@ -356,7 +351,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Fatality Rate */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-1">Fatality Rate</div>
                     <div className="text-xl font-bold text-orange-500 tabular-nums">
@@ -366,11 +360,9 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* 7-day trend for selected country */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-2">7-Day Trend ({selectedCountry})</div>
 
-                    {/* Mini sparkline */}
                     <div className="h-12 flex items-end gap-0.5">
                       {sparklineData.map((value, i) => {
                         const maxValue = Math.max(...sparklineData);
@@ -391,7 +383,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Recent Activity */}
                   <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                     <div className="text-[10px] text-gray-500 uppercase mb-2">Recent Activity</div>
                     <div className="space-y-2">
@@ -411,7 +402,6 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* System Status */}
                   <div className="bg-gray-950 border border-yellow-900/30 p-3 rounded">
                     <div className="text-[10px] text-yellow-600 uppercase mb-2 flex items-center gap-1">
                       <span className="inline-block h-1.5 w-1.5 rounded-full bg-yellow-500 animate-pulse" />
@@ -426,10 +416,41 @@ export default function App() {
           )}
 
           {activeTab === 'charts' && (
-            <div className="h-full grid grid-cols-12 gap-0">
-              {/* LEFT SIDEBAR - Controls */}
-              <div className="col-span-3 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4 space-y-4">
-                {/* Country Selector */}
+            <div className="h-full flex flex-col lg:grid lg:grid-cols-12 lg:gap-0">
+              {/* Mobile filters */}
+              <div className="lg:hidden p-3 bg-gray-900 border-b border-gray-800">
+                <button
+                  onClick={() => setShowMobileFilters(!showMobileFilters)}
+                  className="w-full flex items-center justify-between p-2 bg-gray-950 rounded border border-gray-800"
+                >
+                  <span className="text-sm font-medium">Options</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showMobileFilters && (
+                  <div className="mt-2 space-y-2">
+                    <select
+                      value={selectedCountry}
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      className="w-full bg-gray-950 border border-gray-700 rounded px-3 py-2 text-sm text-white"
+                    >
+                      {allCountries.map(country => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </select>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <button onClick={() => handleDatePreset(7)} className="px-2 py-1.5 text-xs rounded bg-gray-800 border border-gray-700">7j</button>
+                      <button onClick={() => handleDatePreset(30)} className="px-2 py-1.5 text-xs rounded bg-gray-800 border border-gray-700">30j</button>
+                      <button onClick={() => handleDatePreset(90)} className="px-2 py-1.5 text-xs rounded bg-gray-800 border border-gray-700">90j</button>
+                      <button onClick={() => handleDatePreset(0)} className="px-2 py-1.5 text-xs rounded bg-gray-800 border border-gray-700">Tout</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* LEFT SIDEBAR - Desktop Controls */}
+              <div className="hidden lg:block lg:col-span-3 bg-gray-900 border-r border-gray-800 overflow-y-auto p-4 space-y-4">
                 <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                   <label className="text-[10px] text-gray-500 uppercase mb-2 block">Sélection du pays</label>
                   <select
@@ -443,39 +464,16 @@ export default function App() {
                   </select>
                 </div>
 
-                {/* Date Range Selector */}
                 <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                   <label className="text-[10px] text-gray-500 uppercase mb-2 block">Période</label>
 
-                  {/* Presets */}
                   <div className="grid grid-cols-2 gap-2 mb-3">
-                    <button
-                      onClick={() => handleDatePreset(7)}
-                      className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors"
-                    >
-                      7 jours
-                    </button>
-                    <button
-                      onClick={() => handleDatePreset(30)}
-                      className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors"
-                    >
-                      30 jours
-                    </button>
-                    <button
-                      onClick={() => handleDatePreset(90)}
-                      className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors"
-                    >
-                      90 jours
-                    </button>
-                    <button
-                      onClick={() => handleDatePreset(0)}
-                      className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors"
-                    >
-                      Tout
-                    </button>
+                    <button onClick={() => handleDatePreset(7)} className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors">7 jours</button>
+                    <button onClick={() => handleDatePreset(30)} className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors">30 jours</button>
+                    <button onClick={() => handleDatePreset(90)} className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors">90 jours</button>
+                    <button onClick={() => handleDatePreset(0)} className="px-2 py-1.5 text-xs rounded bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-colors">Tout</button>
                   </div>
 
-                  {/* Custom dates */}
                   <div className="space-y-2">
                     <div>
                       <label className="text-[10px] text-gray-600 mb-1 block">Début</label>
@@ -508,7 +506,6 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Stats Summary */}
                 <div className="bg-gray-950 border border-gray-800 p-3 rounded">
                   <div className="text-[10px] text-gray-500 uppercase mb-2">Statistiques {selectedCountry}</div>
                   <div className="space-y-2 text-xs">
@@ -529,9 +526,9 @@ export default function App() {
               </div>
 
               {/* RIGHT AREA - Charts */}
-              <div className="col-span-9 bg-gray-950 overflow-y-auto p-4">
+              <div className="lg:col-span-9 bg-gray-950 overflow-y-auto p-3 lg:p-4 min-h-[500px]">
                 <div className="space-y-4">
-                  <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                  <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 lg:p-4">
                     <h3 className="text-sm font-semibold text-white mb-4">Analyse Détaillée - {selectedCountry}</h3>
                     <AdvancedChart data={chartData} />
                   </div>
@@ -541,10 +538,10 @@ export default function App() {
           )}
 
           {activeTab === 'compare' && (
-            <div className="h-full bg-gray-950 overflow-y-auto p-6">
+            <div className="h-full bg-gray-950 overflow-y-auto p-3 lg:p-6">
               <div className="max-w-7xl mx-auto">
-                <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-                  <h2 className="text-lg font-bold text-white mb-4">Comparaison Multi-Pays</h2>
+                <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 lg:p-6">
+                  <h2 className="text-base lg:text-lg font-bold text-white mb-4">Comparaison Multi-Pays</h2>
                   <CountryComparison />
                 </div>
               </div>

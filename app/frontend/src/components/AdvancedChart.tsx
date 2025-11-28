@@ -27,7 +27,6 @@ type Props = {
   title?: string;
 };
 
-// Calcul de la moyenne mobile
 const calculateMovingAverage = (data: number[], window: number): number[] => {
   return data.map((_, index) => {
     const start = Math.max(0, index - window + 1);
@@ -37,11 +36,25 @@ const calculateMovingAverage = (data: number[], window: number): number[] => {
 };
 
 export default function AdvancedChart({ data, title = "Analyse détaillée" }: Props) {
+  console.log('AdvancedChart received data:', data?.length, 'points'); // DEBUG
+  
   const [showMovingAvg, setShowMovingAvg] = useState(true);
   const [avgWindow, setAvgWindow] = useState(7);
   const [chartType, setChartType] = useState<'combined' | 'cases' | 'deaths'>('combined');
 
-  // Calculer les nouveaux cas/décès quotidiens
+  // Si pas de données, afficher un message
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-[350px] flex flex-col items-center justify-center text-gray-400">
+        <p>Aucune donnée disponible</p>
+        <p className="text-xs mt-2">Sélectionnez une période avec des données</p>
+      </div>
+    );
+  }
+
+  console.log('First data point:', data[0]); // DEBUG
+  console.log('Last data point:', data[data.length - 1]); // DEBUG
+
   const enrichedData = data.map((item, index) => {
     const prev = data[index - 1];
     return {
@@ -51,7 +64,6 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
     };
   });
 
-  // Calculer les moyennes mobiles
   const newCasesArr = enrichedData.map(d => d.newCases || 0);
   const newDeathsArr = enrichedData.map(d => d.newDeaths || 0);
   const avgCases = calculateMovingAverage(newCasesArr, avgWindow);
@@ -63,7 +75,6 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
     avgDeaths: Math.round(avgDeaths[index]),
   }));
 
-  // Calculer la moyenne globale pour la ligne de référence
   const avgTotal = newCasesArr.reduce((a, b) => a + b, 0) / newCasesArr.length;
 
   return (
@@ -165,7 +176,6 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
           />
           <Legend />
 
-          {/* Ligne de référence moyenne */}
           {chartType !== 'deaths' && (
             <ReferenceLine 
               yAxisId="left"
@@ -176,7 +186,6 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
             />
           )}
 
-          {/* Barres pour les nouveaux cas */}
           {(chartType === 'combined' || chartType === 'cases') && (
             <Bar 
               yAxisId="left"
@@ -185,10 +194,10 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
               fillOpacity={0.3}
               name="Nouveaux cas"
               radius={[2, 2, 0, 0]}
+              isAnimationActive={false}
             />
           )}
 
-          {/* Barres pour les décès */}
           {(chartType === 'combined' || chartType === 'deaths') && (
             <Bar 
               yAxisId={chartType === 'combined' ? 'right' : 'left'}
@@ -197,10 +206,10 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
               fillOpacity={0.3}
               name="Nouveaux décès"
               radius={[2, 2, 0, 0]}
+              isAnimationActive={false}
             />
           )}
 
-          {/* Lignes de moyenne mobile */}
           {showMovingAvg && (chartType === 'combined' || chartType === 'cases') && (
             <Line
               yAxisId="left"
@@ -210,6 +219,7 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
               strokeWidth={2}
               dot={false}
               name={`Moy. mobile ${avgWindow}j (cas)`}
+              isAnimationActive={false}
             />
           )}
 
@@ -222,10 +232,10 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
               strokeWidth={2}
               dot={false}
               name={`Moy. mobile ${avgWindow}j (décès)`}
+              isAnimationActive={false}
             />
           )}
 
-          {/* Brush pour zoomer */}
           <Brush 
             dataKey="date" 
             height={30} 
@@ -235,6 +245,11 @@ export default function AdvancedChart({ data, title = "Analyse détaillée" }: P
           />
         </ComposedChart>
       </ResponsiveContainer>
+
+      {/* Info debug */}
+      <div className="text-xs text-gray-500">
+        Affichage: {chartData.length} points • Période: {data[0]?.date} → {data[data.length - 1]?.date}
+      </div>
     </div>
   );
 }

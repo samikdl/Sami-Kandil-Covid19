@@ -7,27 +7,39 @@ type Props = {
 
 export default function Shell({ children }: Props) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-950 text-gray-100">
+      {/* Header compact */}
+      <header className="border-b border-gray-800 bg-gray-900">
+        <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center">
-              <Activity className="h-6 w-6 text-white" />
+            <div className="h-8 w-8 rounded bg-red-600 flex items-center justify-center">
+              <Activity className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                COVID-19 Tracker
+              <h1 className="text-sm font-bold text-white">
+                COVID-19 Global Dashboard
               </h1>
-              <p className="text-xs text-gray-400">Données mondiales en temps réel</p>
+              <p className="text-[10px] text-gray-500">Real-time monitoring system</p>
             </div>
           </div>
-          <div className="text-sm text-gray-400">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse" />
-            Dernière mise à jour
+          
+          <div className="flex items-center gap-2 text-[10px]">
+            <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-gray-400">LIVE</span>
+            <span className="text-gray-600 ml-2">
+              {new Date().toLocaleString('fr-FR', { 
+                month: '2-digit', 
+                day: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit'
+              })}
+            </span>
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-6 py-8">
+
+      <main className="h-[calc(100vh-52px)]">
         {children}
       </main>
     </div>

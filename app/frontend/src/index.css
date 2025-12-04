@@ -1,21 +1,247 @@
 @import "tailwindcss";
-
+@import 'leaflet/dist/leaflet.css';
 
 :root { 
   color-scheme: dark;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 body { 
   margin: 0;
   padding: 0;
-  background: #0a0a0a; 
-  color: #e5e5e5;
+  background: #030712; 
+  color: #e5e7eb;
   min-height: 100vh;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Désactiver le zoom sur double-tap sur mobile */
+  touch-action: manipulation;
 }
 
 #root {
   min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Scrollbar styling - Visible desktop, cachée mobile */
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1f2937;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+  }
+}
+
+/* Selection */
+::selection {
+  background: rgba(239, 68, 68, 0.3);
+  color: white;
+}
+
+/* Leaflet map dark theme */
+.leaflet-container {
+  background: #030712 !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #111827 !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8) !important;
+}
+
+.leaflet-popup-tip {
+  background: #111827 !important;
+}
+
+.leaflet-popup-content {
+  margin: 10px !important;
+  color: #e5e7eb !important;
+  font-size: 11px !important;
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.leaflet-control-zoom a {
+  background: rgba(17, 24, 39, 0.8) !important;
+  color: #9ca3af !important;
+  border: 1px solid #1f2937 !important;
+}
+
+/* Boutons zoom plus gros sur mobile */
+@media (max-width: 768px) {
+  .leaflet-control-zoom a {
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 20px !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .leaflet-control-zoom a {
+    width: 26px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    font-size: 16px !important;
+  }
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(31, 41, 55, 0.9) !important;
+  color: #e5e7eb !important;
+}
+
+.leaflet-control-attribution {
+  display: none;
+}
+
+/* Monospace numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Ne pas casser les animations transform (Recharts, Leaflet, etc.) */
+*[style*="transform"] {
+  transition: none !important;
+}
+
+/* Date inputs - Force light mode pour le picker */
+input[type="date"] {
+  color-scheme: light;
+  background-color: #111827 !important;
+  color: white !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.8);
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  color: white;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #6b7280;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: white;
+}
+
+/* Select styling */
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background: #1f2937;
+  color: white;
+}
+
+/* Button focus states */
+button:focus-visible {
+  outline: 2px solid rgba(239, 68, 68, 0.5);
+  outline-offset: 2px;
+}
+
+/* Touch feedback pour mobile */
+@media (max-width: 768px) {
+  button:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Recharts responsive */
+.recharts-wrapper {
+  font-size: 11px !important;
+}
+
+@media (max-width: 640px) {
+  .recharts-wrapper {
+    font-size: 9px !important;
+  }
+}
+
+.recharts-default-tooltip {
+  background: #1f2937 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 640px) {
+  .recharts-default-tooltip {
+    font-size: 10px !important;
+  }
+}
+
+/* Amélioration lisibilité petit écran */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.125rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Éviter le débordement horizontal global */
+body {
+  overflow-x: hidden;
+}
+
+/* Empêcher les images de déborder, mais laisser les SVG intacts (Recharts, Leaflet, etc.) */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Safe area pour encoche iPhone */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Désactiver le pull-to-refresh sur mobile */
+body {
+  overscroll-behavior-y: contain;
 }

@@ -19,7 +19,9 @@ jobs:
       - name: Trust github.com host
         run: ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
 
-      - name: Push --mirror to Epitech
+      - name: Push to Epitech
         run: |
           git remote add school git@github.com:EpitechPGE3-2025/G-PRO-500-STG-5-1-professionalwork-5.git
-          git push --mirror school
+          git push school --all
+          git push school --tags
+

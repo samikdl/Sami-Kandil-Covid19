@@ -23,7 +23,7 @@ test('affiche les contrôles et le récapitulatif quand il y a des données', ()
 
   render(<AdvancedChart data={data} title="Analyse France" />);
 
-  // Boutons de type de graphique
+
   expect(
     screen.getByRole('button', { name: /Combiné/i })
   ).toBeInTheDocument();
@@ -34,7 +34,6 @@ test('affiche les contrôles et le récapitulatif quand il y a des données', ()
     screen.getByRole('button', { name: /Décès/i })
   ).toBeInTheDocument();
 
-  // Petit texte de récap en bas
   expect(
     screen.getByText(/Affichage:\s*3 points/i)
   ).toBeInTheDocument();

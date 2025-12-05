@@ -5,10 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;   // <-- IMPORTANT
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.NoSuchElementException;
-
 
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(MetricsController.class)
-@AutoConfigureMockMvc(addFilters = false)   // <-- désactive les filtres Spring Security (pas de 401)
+@AutoConfigureMockMvc(addFilters = false)
 class MetricsControllerTest {
 
     @Autowired
@@ -35,6 +34,7 @@ class MetricsControllerTest {
     @MockBean
     private MetricsService metricsService;
 
+    // Vérifie que l'endpoint /metrics/global renvoie bien le JSON renvoyé par le service (statuts + champs attendus)
     @Test
     void globalEndpoint_shouldReturnJsonFromService() throws Exception {
         when(metricsService.global(null)).thenReturn(
@@ -53,6 +53,7 @@ class MetricsControllerTest {
                .andExpect(jsonPath("$.deaths_cumulative").value(4));
     }
 
+    // Vérifie que /metrics/country/{name} renvoie bien le pays, la série complète et le champ latest correctement calculé
     @Test
     void countryEndpoint_shouldWrapSeriesAndLatest() throws Exception {
         List<Map<String, Object>> series = List.of(
@@ -85,13 +86,12 @@ class MetricsControllerTest {
                .andExpect(jsonPath("$.latest.deaths_cum").value(2));
     }
 
+    // Vérifie que si le service lève NoSuchElementException pour un pays inconnu, l'API renvoie bien un 404 avec un corps d'erreur
     @Test
     void countryEndpoint_withUnknownCountry_returns404AndErrorBody() throws Exception {
-        // Arrange : le service lève une NoSuchElementException
         when(metricsService.countrySeries(eq("Narnia"), any(), any()))
                 .thenThrow(new NoSuchElementException("Country not found: Narnia"));
 
-        // Act + Assert
         mockMvc.perform(get("/api/v1/metrics/country/Narnia"))
             .andExpect(status().isNotFound())
             .andExpect(content().contentType("application/json"))
@@ -99,6 +99,7 @@ class MetricsControllerTest {
             .andExpect(jsonPath("$.message").value("Country not found: Narnia"));
     }
 
+    // Vérifie que /metrics/countries renvoie bien la liste de noms de pays fournie par le service sous forme de tableau JSON
     @Test
     void countriesEndpoint_shouldReturnListOfNames() throws Exception {
         when(metricsService.getAllCountries())

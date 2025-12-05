@@ -43,7 +43,12 @@ GRANT ALL PRIVILEGES ON DATABASE covid TO covid;
 psql -U covid -d covid -f database/schema.sql
 ```
 
-### 2. Backend
+### 2. Docker
+```bash
+docker-compose up -d
+```
+
+### 3. Backend
 
 ```bash
 cd backend
@@ -52,7 +57,7 @@ mvn spring-boot:run
 # API disponible sur http://localhost:9090
 ```
 
-### 3. Frontend
+### 4. Frontend
 
 ```bash
 cd frontend
@@ -61,7 +66,7 @@ npm run dev
 # Application disponible sur http://localhost:5173
 ```
 
-### 4. Ingestion des données
+### 5. Ingestion des données
 
 ```bash
 cd ingestion

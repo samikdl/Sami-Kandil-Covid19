@@ -207,7 +207,7 @@ spring:
 
 ## 👥 Auteurs
 
-- Développement : [Votre Nom]
+- Développement : Sami Kandil
 - Formation : Projet académique
 
 ## 📄 Licence

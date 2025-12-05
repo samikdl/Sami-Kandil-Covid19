@@ -208,7 +208,7 @@ spring:
 ## 👥 Auteurs
 
 - Développement : Sami Kandil
-- Formation : Projet académique
+- Formation : EPITECH
 
 ## 📄 Licence
 

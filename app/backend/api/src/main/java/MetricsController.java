@@ -29,10 +29,10 @@ public class MetricsController {
     return out;
   }
 
-  @GetMapping("/countries")
-  public List<String> countries() {
-      return service.getAllCountries();
-  }
+  // @GetMapping("/countries")
+  // public List<String> countries() {
+  //     return service.getAllCountries();
+  // }
 
   // Nouveau endpoint : dernières stats de tous les pays (pour la carte)
   @GetMapping("/countries/latest")
